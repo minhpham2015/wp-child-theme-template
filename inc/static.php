@@ -5,8 +5,6 @@
  * @package __NAMESPACE__
  */
 
-namespace __NAMESPACE__;
-
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
