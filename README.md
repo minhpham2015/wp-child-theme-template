@@ -9,6 +9,8 @@ A complete, production-ready WordPress child theme template with organized struc
 - [Structure](#structure)
 - [Creating Your Child Theme](#creating-your-child-theme)
 - [Placeholders](#placeholders)
+- [PHP Namespaces](#php-namespaces)
+- [ACF Integration](#acf-integration)
 - [Installation](#installation)
 - [Features](#features)
 
@@ -221,7 +223,7 @@ This template uses placeholders that **MUST** be replaced with your actual value
 - `__CHILD_THEME_SLUG__` - Your child theme slug (lowercase, hyphens)
 - `__CHILD_THEME_NAME__` - Your child theme display name
 - `__PARENT_THEME_SLUG__` - Parent theme folder name
-- `__NAMESPACE__` - PHP namespace (PascalCase, e.g., `MyTheme` or `MyCompany\MyTheme`)
+- `__NAMESPACE__` - **REQUIRED** PHP namespace (PascalCase, e.g., `MyTheme` or `MyCompany\MyTheme`) - Used for all functions and classes
 - `__AUTHOR__` - Your name or company
 - `__DESCRIPTION__` - Theme description
 - `__VERSION__` - Version number (e.g., 1.0.0)
@@ -285,6 +287,169 @@ composer install
 
 Add a `screenshot.png` file (1200x900px recommended) to the theme root directory.
 
+## 🔷 PHP Namespaces
+
+This theme uses **PHP namespaces** for better code organization and to avoid naming conflicts. All functions are namespaced using the `__NAMESPACE__` placeholder.
+
+### How Namespaces Work
+
+All PHP files in the `inc/` directory use the namespace declared at the top:
+
+```php
+namespace __NAMESPACE__;
+
+function my_function() {
+    // Function code
+}
+```
+
+### Using Namespaced Functions
+
+**Method 1: Full namespace path**
+```php
+<?php
+// Call function with full namespace
+$result = __NAMESPACE__\get_acf_option( 'field_name', 'default' );
+```
+
+**Method 2: Import with `use` statement (Recommended)**
+```php
+<?php
+use __NAMESPACE__\get_acf_option;
+use __NAMESPACE__\render_hero;
+
+// Now you can use the function directly
+$value = get_acf_option( 'field_name', 'default' );
+render_hero();
+```
+
+**Method 3: Import multiple functions**
+```php
+<?php
+use __NAMESPACE__\{ get_acf_option, render_hero, dump };
+
+// Use imported functions
+$value = get_acf_option( 'field_name' );
+render_hero();
+dump( $data );
+```
+
+### Available Namespaced Functions
+
+- `__NAMESPACE__\enqueue_assets()` - Enqueues styles and scripts
+- `__NAMESPACE__\add_body_class( $classes )` - Adds body class
+- `__NAMESPACE__\dump( $data )` - Debug helper function
+- `__NAMESPACE__\ajax_demo()` - AJAX demo handler
+- `__NAMESPACE__\button_shortcode( $atts )` - Button shortcode handler
+- `__NAMESPACE__\render_hero()` - Renders hero section
+- `__NAMESPACE__\get_acf_option( $field_name, $default )` - Gets ACF option
+- `__NAMESPACE__\register_acf_options_page()` - Registers ACF options page
+
+### Important Notes
+
+- ⚠️ **Namespace is REQUIRED** - All functions use namespaces, so `__NAMESPACE__` must be replaced
+- 📝 **Use PascalCase** - Namespace should be PascalCase (e.g., `MyTheme`, not `my-theme`)
+- 🔗 **No spaces or hyphens** - Use underscores or backslashes for sub-namespaces only
+- ✅ **Consistent naming** - Keep the same namespace throughout all files
+
+## 🎨 ACF Integration
+
+This theme includes **automatic Advanced Custom Fields (ACF) integration**. When ACF is installed and active, a "Theme Options" page is automatically created in the WordPress admin.
+
+### Automatic Theme Options Page
+
+The theme automatically checks if ACF is active and creates a "Theme Options" page:
+
+- **Location**: WordPress Admin → **Theme Options**
+- **Icon**: Generic admin icon
+- **Capability**: `edit_posts` (can be customized in `inc/acf.php`)
+- **Only appears when**: ACF plugin is installed and active
+
+### Setting Up ACF Theme Options
+
+1. **Install ACF Plugin**:
+   - Install "Advanced Custom Fields" or "ACF Pro" plugin
+   - Activate the plugin
+
+2. **Create Field Groups**:
+   - Go to **Custom Fields** → **Add New**
+   - Create your field group
+   - In **Location Rules**, select:
+     - **Options Page** → **is equal to** → **Theme Options**
+   - Publish the field group
+
+3. **Use Options in Templates**:
+   ```php
+   <?php
+   use __NAMESPACE__\get_acf_option;
+   
+   // Method 1: Using helper function (recommended)
+   $header_text = get_acf_option( 'header_text', 'Default Header' );
+   $logo_url = get_acf_option( 'logo', '' );
+   $footer_text = get_acf_option( 'footer_text', '© 2024' );
+   
+   // Method 2: Using ACF function directly
+   if ( function_exists( 'get_field' ) ) {
+       $logo = get_field( 'logo', 'option' );
+       $phone = get_field( 'phone_number', 'option' );
+   }
+   ```
+
+### Helper Function: `get_acf_option()`
+
+The theme provides a helper function for safely getting ACF options:
+
+```php
+get_acf_option( string $field_name, mixed $default = false )
+```
+
+**Parameters:**
+- `$field_name` - The ACF field name
+- `$default` - Default value if field is empty or ACF is not active
+
+**Returns:** Field value or default value
+
+**Example:**
+```php
+<?php
+use __NAMESPACE__\get_acf_option;
+
+// Get header text with fallback
+$header = get_acf_option( 'header_text', 'Welcome' );
+
+// Get logo URL (empty string if not set)
+$logo = get_acf_option( 'logo', '' );
+
+// Get social links (empty array if not set)
+$social = get_acf_option( 'social_links', [] );
+```
+
+### Benefits
+
+- ✅ **Automatic detection** - Only loads if ACF is active
+- ✅ **No errors without ACF** - Theme works perfectly without ACF
+- ✅ **Safe fallbacks** - Helper function provides defaults
+- ✅ **Easy to use** - Simple function calls in templates
+- ✅ **Centralized options** - All theme options in one place
+
+### Customizing Theme Options
+
+To customize the Theme Options page (icon, position, capability), edit `inc/acf.php`:
+
+```php
+acf_add_options_page( [
+    'page_title' => __( 'Theme Options', '__CHILD_THEME_SLUG__' ),
+    'menu_title' => __( 'Theme Options', '__CHILD_THEME_SLUG__' ),
+    'menu_slug'  => 'theme-options',
+    'capability' => 'edit_posts',  // Change capability here
+    'redirect'   => false,
+    'icon_url'   => 'dashicons-admin-generic',  // Change icon here
+    'position'   => 30,  // Change menu position here
+] );
+```
+
+**Note:** The ACF Theme Options page only appears if ACF plugin is active. The theme will work fine without ACF installed.
+
 ## 📦 Installation
 
 ### Method 1: Manual Installation
@@ -315,8 +480,8 @@ Add a `screenshot.png` file (1200x900px recommended) to the theme root directory
 - ✅ **AJAX Ready** - Built-in AJAX handler example
 - ✅ **Shortcode Support** - Example shortcode implementation
 - ✅ **WooCommerce Ready** - Template override structure
-- ✅ **ACF Integration** - Automatic Theme Options page when ACF is active
-- ✅ **PHP Namespaces** - Organized code with namespace support
+- ✅ **ACF Integration** - Automatic "Theme Options" page when ACF is active (see [ACF Integration](#acf-integration))
+- ✅ **PHP Namespaces** - All functions use namespaces for better organization (see [PHP Namespaces](#php-namespaces))
 - ✅ **Security** - All files include ABSPATH checks
 - ✅ **Best Practices** - Follows WordPress coding standards
 - ✅ **Version Control** - Proper versioning for cache busting
@@ -358,27 +523,7 @@ Add new AJAX handlers in `inc/ajax.php` following the existing pattern.
 
 ### Using ACF Theme Options
 
-If Advanced Custom Fields (ACF) is installed and active, a "Theme Options" page will automatically appear in the WordPress admin menu.
-
-**To use ACF options in your templates:**
-
-```php
-<?php
-use __NAMESPACE__\get_acf_option;
-
-// Get an option value using helper function
-$header_text = get_acf_option( 'header_text', 'Default text' );
-
-// Or use ACF function directly
-if ( function_exists( 'get_field' ) ) {
-    $logo = get_field( 'logo', 'option' );
-}
-```
-
-**Helper function available:**
-- `__NAMESPACE__\get_acf_option( $field_name, $default )` - Get ACF option with fallback
-
-**Note:** The ACF Theme Options page only appears if ACF plugin is active. The theme will work fine without ACF.
+See the [ACF Integration](#acf-integration) section above for detailed information about using ACF Theme Options.
 
 ## 📝 Notes
 
@@ -389,8 +534,8 @@ if ( function_exists( 'get_field' ) ) {
 - **Build before deployment** - Always run `npm run build` before deploying to production
 - **Don't commit node_modules** - Already in `.gitignore`
 - **SCSS compilation** - The `main.css` file is auto-generated, don't edit it directly
-- **PHP Namespaces** - All functions use namespaces. Use `__NAMESPACE__\function_name()` or `use __NAMESPACE__\function_name;` to call them
-- **ACF Theme Options** - Only appears if ACF plugin is installed and active
+- **PHP Namespaces** - **REQUIRED**: All functions use namespaces. Replace `__NAMESPACE__` with your PascalCase namespace (e.g., `MyTheme`). Use `__NAMESPACE__\function_name()` or `use __NAMESPACE__\function_name;` to call them. See [PHP Namespaces](#php-namespaces) section for details.
+- **ACF Theme Options** - Automatically creates "Theme Options" page when ACF plugin is installed and active. See [ACF Integration](#acf-integration) section for usage examples.
 
 ## 🆘 Troubleshooting
 
@@ -419,6 +564,21 @@ if ( function_exists( 'get_field' ) ) {
 - Try deleting `node_modules` and running `npm install` again
 - Check that all SCSS imports in `main.scss` are correct
 - Verify file paths in `package.json` scripts match your structure
+
+### Namespace errors
+
+- Ensure `__NAMESPACE__` placeholder is replaced in ALL PHP files
+- Use PascalCase for namespace (e.g., `MyTheme`, not `my-theme`)
+- Check that namespace is consistent across all files
+- Verify function calls use correct namespace syntax: `__NAMESPACE__\function_name()` or import with `use`
+
+### ACF Theme Options not appearing
+
+- Verify ACF plugin is installed and activated
+- Check that ACF Pro or free version is active (both supported)
+- Clear WordPress cache
+- Check `inc/acf.php` file exists and is loaded in `inc/init-load.php`
+- Verify no PHP errors in WordPress debug log
 
 ## 📄 License
 
