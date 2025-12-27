@@ -1,9 +1,17 @@
 <?php
+/**
+ * Enqueue Styles and Scripts
+ *
+ * @package __NAMESPACE__
+ */
+
+namespace __NAMESPACE__;
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-function __CHILD_THEME_SLUG__enqueue_assets() {
+function enqueue_assets() {
 
     $version = wp_get_theme()->get( 'Version' );
 
@@ -31,5 +39,5 @@ function __CHILD_THEME_SLUG__enqueue_assets() {
     );
 }
 
-add_action( 'wp_enqueue_scripts', '__CHILD_THEME_SLUG__enqueue_assets' );
+add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\enqueue_assets' );
 

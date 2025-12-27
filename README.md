@@ -186,7 +186,8 @@ child-theme/
 │   ├── helper.php               # Helper functions
 │   ├── ajax.php                 # AJAX handlers
 │   ├── shortcode.php            # Shortcode definitions
-│   └── template-functions.php   # Template functions
+│   ├── template-functions.php   # Template functions
+│   └── acf.php                  # ACF Theme Options integration
 │
 ├── template-parts/               # Reusable template parts
 │   └── components/
@@ -220,7 +221,7 @@ This template uses placeholders that **MUST** be replaced with your actual value
 - `__CHILD_THEME_SLUG__` - Your child theme slug (lowercase, hyphens)
 - `__CHILD_THEME_NAME__` - Your child theme display name
 - `__PARENT_THEME_SLUG__` - Parent theme folder name
-- `__NAMESPACE__` - PHP namespace (optional, PascalCase)
+- `__NAMESPACE__` - PHP namespace (PascalCase, e.g., `MyTheme` or `MyCompany\MyTheme`)
 - `__AUTHOR__` - Your name or company
 - `__DESCRIPTION__` - Theme description
 - `__VERSION__` - Version number (e.g., 1.0.0)
@@ -231,6 +232,7 @@ If your child theme is "My Awesome Theme":
 - `__CHILD_THEME_SLUG__` → `my-awesome-theme`
 - `__CHILD_THEME_NAME__` → `My Awesome Theme`
 - `__PARENT_THEME_SLUG__` → `parent-theme-slug` (your parent theme folder)
+- `__NAMESPACE__` → `MyAwesomeTheme` (PascalCase, no spaces or hyphens)
 - `__AUTHOR__` → `Your Name`
 - `__DESCRIPTION__` → `A custom child theme for...`
 - `__VERSION__` → `1.0.0`
@@ -313,6 +315,8 @@ Add a `screenshot.png` file (1200x900px recommended) to the theme root directory
 - ✅ **AJAX Ready** - Built-in AJAX handler example
 - ✅ **Shortcode Support** - Example shortcode implementation
 - ✅ **WooCommerce Ready** - Template override structure
+- ✅ **ACF Integration** - Automatic Theme Options page when ACF is active
+- ✅ **PHP Namespaces** - Organized code with namespace support
 - ✅ **Security** - All files include ABSPATH checks
 - ✅ **Best Practices** - Follows WordPress coding standards
 - ✅ **Version Control** - Proper versioning for cache busting
@@ -352,6 +356,30 @@ Add new shortcodes in `inc/shortcode.php` following the existing pattern.
 
 Add new AJAX handlers in `inc/ajax.php` following the existing pattern.
 
+### Using ACF Theme Options
+
+If Advanced Custom Fields (ACF) is installed and active, a "Theme Options" page will automatically appear in the WordPress admin menu.
+
+**To use ACF options in your templates:**
+
+```php
+<?php
+use __NAMESPACE__\get_acf_option;
+
+// Get an option value using helper function
+$header_text = get_acf_option( 'header_text', 'Default text' );
+
+// Or use ACF function directly
+if ( function_exists( 'get_field' ) ) {
+    $logo = get_field( 'logo', 'option' );
+}
+```
+
+**Helper function available:**
+- `__NAMESPACE__\get_acf_option( $field_name, $default )` - Get ACF option with fallback
+
+**Note:** The ACF Theme Options page only appears if ACF plugin is active. The theme will work fine without ACF.
+
 ## 📝 Notes
 
 - **Never edit parent theme files directly** - Always use a child theme
@@ -361,6 +389,8 @@ Add new AJAX handlers in `inc/ajax.php` following the existing pattern.
 - **Build before deployment** - Always run `npm run build` before deploying to production
 - **Don't commit node_modules** - Already in `.gitignore`
 - **SCSS compilation** - The `main.css` file is auto-generated, don't edit it directly
+- **PHP Namespaces** - All functions use namespaces. Use `__NAMESPACE__\function_name()` or `use __NAMESPACE__\function_name;` to call them
+- **ACF Theme Options** - Only appears if ACF plugin is installed and active
 
 ## 🆘 Troubleshooting
 

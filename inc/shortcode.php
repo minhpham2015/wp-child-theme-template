@@ -1,4 +1,12 @@
 <?php
+/**
+ * Shortcode Definitions
+ *
+ * @package __NAMESPACE__
+ */
+
+namespace __NAMESPACE__;
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -6,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Shortcode: [__CHILD_THEME_SLUG___button]
  */
-function __CHILD_THEME_SLUG__button_shortcode( $atts ) {
+function button_shortcode( $atts ) {
 
     $atts = shortcode_atts(
         [
@@ -25,6 +33,6 @@ function __CHILD_THEME_SLUG__button_shortcode( $atts ) {
 
 add_shortcode(
     '__CHILD_THEME_SLUG___button',
-    '__CHILD_THEME_SLUG__button_shortcode'
+    __NAMESPACE__ . '\\button_shortcode'
 );
 
