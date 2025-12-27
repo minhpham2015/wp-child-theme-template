@@ -30,7 +30,9 @@
     "build:css": "npm run build:css",
     "build:js": "npm run build:js",
     "watch": "npm run watch",
-    "dev": "npm run dev"
+    "watch:css": "npm run watch:css",
+    "dev": "npm run dev",
+    "dev:watch": "npm run watch:css"
   },
   "config": {
     "optimize-autoloader": true,

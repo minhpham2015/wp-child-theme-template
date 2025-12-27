@@ -103,10 +103,13 @@ composer build:css
 # Build JS only
 composer build:js
 
-# Watch mode
+# Watch mode (CSS + JS)
 composer watch
 
-# Development mode
+# Watch CSS only
+composer dev:watch
+
+# Development mode (watch everything)
 composer dev
 ```
 
@@ -122,19 +125,83 @@ composer dev
    - Output: `assets/js/main.min.js`
    - Includes source maps for debugging
 
-### Development Workflow
+### Development Mode (DEV_MODE)
+
+The theme includes a **Development Mode** feature that automatically compiles CSS on page load when enabled. This is perfect for active development when you want CSS to update automatically without running watch commands.
+
+#### Enabling Development Mode
+
+**Method 1: Environment Variable (Recommended)**
+```bash
+# Set environment variable
+export DEV_MODE=true
+
+# Or in Windows PowerShell
+$env:DEV_MODE="true"
+
+# Or in Windows CMD
+set DEV_MODE=true
+```
+
+**Method 2: Edit config.php**
+```php
+// In config.php, uncomment and set to true:
+define( 'DEV_MODE', true );
+```
+
+#### How It Works
+
+When `DEV_MODE` is enabled:
+- CSS automatically compiles from SCSS on each page load
+- Only compiles if SCSS file is newer than CSS file (smart compilation)
+- Works seamlessly with WordPress page loads
+- No need to run watch commands manually
+
+#### Development Workflow with DEV_MODE
+
+1. **Enable Development Mode**:
+   ```bash
+   # Set environment variable
+   export DEV_MODE=true
+   
+   # Or edit config.php and set DEV_MODE to true
+   ```
+
+2. **Start WordPress**:
+   - Just load any page in your browser
+   - CSS will automatically compile if SCSS has changed
+
+3. **Edit SCSS files**:
+   - Edit files in `assets/scss/`
+   - Refresh the page - CSS compiles automatically!
+
+4. **Disable for Production**:
+   ```bash
+   # Unset environment variable
+   unset DEV_MODE
+   
+   # Or set DEV_MODE to false in config.php
+   define( 'DEV_MODE', false );
+   ```
+
+#### Manual Watch Mode (Alternative)
+
+If you prefer traditional watch mode instead of auto-compilation:
 
 1. **Start development**:
    ```bash
    npm run dev
    # or
    composer dev
+   # or watch CSS only
+   composer dev:watch
    ```
    This starts watch mode - files will auto-rebuild on changes.
 
 2. **Edit your files**:
    - Edit SCSS files in `assets/scss/`
    - Edit JavaScript in `assets/js/main.js`
+   - Changes compile automatically in the background
 
 3. **Production build**:
    ```bash
@@ -148,6 +215,8 @@ composer dev
 - 📝 **Don't edit `assets/css/main.css` directly** - It's auto-generated from SCSS
 - 🔄 **Run `npm run build` after replacing placeholders** - Ensures all files are properly compiled
 - 📦 **Include `node_modules/` in `.gitignore`** - Already configured
+- 🚀 **DEV_MODE for active development** - Enable DEV_MODE for auto CSS compilation on page load
+- ⚡ **Disable DEV_MODE in production** - Always set DEV_MODE to false in production for better performance
 
 ## 📁 Structure
 
@@ -179,10 +248,12 @@ child-theme/
 │
 ├── package.json                 # npm dependencies & scripts
 ├── composer.json                # Composer dependencies & scripts
+├── config.php                   # Theme configuration (DEV_MODE)
 └── .gitignore                   # Git ignore rules
 │
 ├── inc/                         # PHP includes
 │   ├── init-load.php            # Loads all includes
+│   ├── build.php                # Auto CSS compilation (DEV_MODE)
 │   ├── static.php               # Enqueues styles & scripts
 │   ├── hooks.php                # WordPress hooks & filters
 │   ├── helper.php               # Helper functions
@@ -482,6 +553,7 @@ acf_add_options_page( [
 - ✅ **WooCommerce Ready** - Template override structure
 - ✅ **ACF Integration** - Automatic "Theme Options" page when ACF is active (see [ACF Integration](#acf-integration))
 - ✅ **PHP Namespaces** - All functions use namespaces for better organization (see [PHP Namespaces](#php-namespaces))
+- ✅ **DEV_MODE** - Auto CSS compilation on page load in development mode
 - ✅ **Security** - All files include ABSPATH checks
 - ✅ **Best Practices** - Follows WordPress coding standards
 - ✅ **Version Control** - Proper versioning for cache busting
@@ -536,6 +608,7 @@ See the [ACF Integration](#acf-integration) section above for detailed informati
 - **SCSS compilation** - The `main.css` file is auto-generated, don't edit it directly
 - **PHP Namespaces** - **REQUIRED**: All functions use namespaces. Replace `__NAMESPACE__` with your PascalCase namespace (e.g., `MyTheme`). Use `__NAMESPACE__\function_name()` or `use __NAMESPACE__\function_name;` to call them. See [PHP Namespaces](#php-namespaces) section for details.
 - **ACF Theme Options** - Automatically creates "Theme Options" page when ACF plugin is installed and active. See [ACF Integration](#acf-integration) section for usage examples.
+- **DEV_MODE** - Enable `DEV_MODE` for automatic CSS compilation on page load. Always disable in production. See [Development Mode](#development-mode-dev_mode) section for details.
 
 ## 🆘 Troubleshooting
 
@@ -579,6 +652,16 @@ See the [ACF Integration](#acf-integration) section above for detailed informati
 - Clear WordPress cache
 - Check `inc/acf.php` file exists and is loaded in `inc/init-load.php`
 - Verify no PHP errors in WordPress debug log
+
+### DEV_MODE not working
+
+- Verify `DEV_MODE` is set to `true` in `config.php` or as environment variable
+- Check that `node_modules/.bin/sass` exists (run `npm install` if missing)
+- Ensure `assets/scss/main.scss` file exists
+- Check file permissions - WordPress needs write access to `assets/css/` directory
+- Verify `config.php` is loaded in `functions.php`
+- Check WordPress debug log for PHP errors
+- Note: DEV_MODE only compiles if SCSS is newer than CSS (smart compilation)
 
 ## 👤 Author
 
