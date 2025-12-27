@@ -127,7 +127,13 @@ composer dev
 
 ### Development Mode (DEV_MODE)
 
-The theme includes a **Development Mode** feature that automatically compiles CSS on page load when enabled. This is perfect for active development when you want CSS to update automatically without running watch commands.
+The theme includes a **Development Mode** feature that automatically compiles CSS from SCSS on page load when enabled. This uses the **scssphp/scssphp** composer package for PHP-based SCSS compilation - no Node.js or npm required for auto-compilation!
+
+**Key Features:**
+- ✅ **Automatic compilation** - CSS compiles automatically on each page load when DEV_MODE is enabled
+- ✅ **PHP-based** - Uses `scssphp/scssphp` composer package (no Node.js needed for auto-compile)
+- ✅ **Smart compilation** - Only compiles if SCSS files are newer than CSS
+- ✅ **No manual commands** - Just enable DEV_MODE and refresh your page
 
 #### Enabling Development Mode
 
@@ -159,23 +165,34 @@ When `DEV_MODE` is enabled:
 
 #### Development Workflow with DEV_MODE
 
-1. **Enable Development Mode**:
+1. **Install Composer Dependencies** (if not already done):
+   ```bash
+   composer install
+   ```
+   This installs the `scssphp/scssphp` package needed for auto-compilation.
+
+2. **Enable Development Mode**:
    ```bash
    # Set environment variable
    export DEV_MODE=true
    
+   # Or in Windows PowerShell
+   $env:DEV_MODE="true"
+   
    # Or edit config.php and set DEV_MODE to true
+   define( 'DEV_MODE', true );
    ```
 
-2. **Start WordPress**:
+3. **Start WordPress**:
    - Just load any page in your browser
-   - CSS will automatically compile if SCSS has changed
+   - CSS will automatically compile from SCSS on page load!
 
-3. **Edit SCSS files**:
+4. **Edit SCSS files**:
    - Edit files in `assets/scss/`
-   - Refresh the page - CSS compiles automatically!
+   - Refresh the page - CSS compiles automatically using PHP!
+   - No need to run any commands
 
-4. **Disable for Production**:
+5. **Disable for Production**:
    ```bash
    # Unset environment variable
    unset DEV_MODE
@@ -183,6 +200,8 @@ When `DEV_MODE` is enabled:
    # Or set DEV_MODE to false in config.php
    define( 'DEV_MODE', false );
    ```
+
+> **💡 How It Works**: When `DEV_MODE` is enabled, the theme uses the `scssphp/scssphp` composer package to automatically compile SCSS to CSS on each page load. This is a pure PHP solution - no Node.js or npm required for the auto-compilation feature!
 
 #### Manual Watch Mode (Alternative)
 
@@ -215,8 +234,9 @@ If you prefer traditional watch mode instead of auto-compilation:
 - 📝 **Don't edit `assets/css/main.css` directly** - It's auto-generated from SCSS
 - 🔄 **Run `npm run build` after replacing placeholders** - Ensures all files are properly compiled
 - 📦 **Include `node_modules/` in `.gitignore`** - Already configured
-- 🚀 **DEV_MODE for active development** - Enable DEV_MODE for auto CSS compilation on page load
+- 🚀 **DEV_MODE for active development** - Enable DEV_MODE for auto CSS compilation on page load (uses scssphp/scssphp composer package)
 - ⚡ **Disable DEV_MODE in production** - Always set DEV_MODE to false in production for better performance
+- 📦 **PHP-based SCSS compilation** - Auto-compilation uses `scssphp/scssphp` - no Node.js required for DEV_MODE feature
 
 ## 📁 Structure
 
@@ -344,15 +364,17 @@ Template: __PARENT_THEME_SLUG__  /* Replace with actual parent theme folder */
 Install build dependencies and compile assets:
 
 ```bash
-# Install npm dependencies
+# Install Composer dependencies (includes scssphp/scssphp for auto-compilation)
+composer install
+
+# Install npm dependencies (for manual build/watch commands)
 npm install
 
-# Build CSS and JS
+# Build CSS and JS manually (optional - auto-compilation works with DEV_MODE)
 npm run build
-
-# Or use Composer (installs npm deps automatically)
-composer install
 ```
+
+> **💡 Note**: The `scssphp/scssphp` composer package is automatically installed with `composer install`. This enables automatic SCSS compilation on page load when `DEV_MODE` is enabled - no Node.js required for auto-compilation!
 
 ### Step 5: Add Screenshot
 
@@ -656,12 +678,14 @@ See the [ACF Integration](#acf-integration) section above for detailed informati
 ### DEV_MODE not working
 
 - Verify `DEV_MODE` is set to `true` in `config.php` or as environment variable
-- Check that `node_modules/.bin/sass` exists (run `npm install` if missing)
+- **Install composer dependencies**: Run `composer install` to install `scssphp/scssphp` package
+- Check that `vendor/scssphp/scssphp` directory exists (composer package installed)
 - Ensure `assets/scss/main.scss` file exists
 - Check file permissions - WordPress needs write access to `assets/css/` directory
 - Verify `config.php` is loaded in `functions.php`
 - Check WordPress debug log for PHP errors
 - Note: DEV_MODE only compiles if SCSS is newer than CSS (smart compilation)
+- **Important**: DEV_MODE uses PHP-based SCSS compiler (`scssphp/scssphp`), not Node.js sass
 
 ## 👤 Author
 

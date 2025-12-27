@@ -11,7 +11,8 @@
     }
   ],
   "require": {
-    "php": ">=7.4"
+    "php": ">=7.4",
+    "scssphp/scssphp": "^1.12"
   },
   "require-dev": {
     "composer/installers": "^2.2"
