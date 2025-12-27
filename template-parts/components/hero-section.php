@@ -1,0 +1,4 @@
+<section class="hero">
+  <h1>Hero Section</h1>
+</section>
+

@@ -1,0 +1,17 @@
+/* Main SCSS file */
+
+// Import variables first
+@import 'variables';
+
+// Import mixins
+@import 'mixins';
+
+// Import base styles
+@import 'base';
+
+// Import layout
+@import 'layout';
+
+// Import components
+@import 'components/buttons';
+

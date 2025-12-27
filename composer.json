@@ -1,0 +1,40 @@
+{
+  "name": "__AUTHOR__/__CHILD_THEME_SLUG__",
+  "description": "__DESCRIPTION__",
+  "type": "wordpress-theme",
+  "version": "__VERSION__",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "__AUTHOR__",
+      "email": ""
+    }
+  ],
+  "require": {
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "composer/installers": "^2.2"
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "@npm-install",
+      "@build"
+    ],
+    "post-update-cmd": [
+      "@npm-install",
+      "@build"
+    ],
+    "npm-install": "npm install",
+    "build": "npm run build",
+    "build:css": "npm run build:css",
+    "build:js": "npm run build:js",
+    "watch": "npm run watch",
+    "dev": "npm run dev"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  }
+}
+
