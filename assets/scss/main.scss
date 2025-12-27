@@ -1,17 +1,17 @@
 /* Main SCSS file */
 
 // Use variables first
-@use 'variables';
+@import 'variables';
 
 // Use mixins
-@use 'mixins';
+@import 'mixins';
 
 // Use base styles
-@use 'base';
+@import 'base';
 
 // Use layout
-@use 'layout';
+@import 'layout';
 
 // Use components
-@use 'components/buttons';
+@import 'components/buttons';
 
