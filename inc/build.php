@@ -8,8 +8,6 @@
  * @package __NAMESPACE__
  */
 
-namespace __NAMESPACE__;
-
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -20,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Automatically compiles SCSS to CSS on each page load when DEV_MODE is enabled.
  * Uses the scssphp/scssphp composer package for PHP-based SCSS compilation.
  */
-function auto_compile_css() {
+function __CHILD_THEME_PREFIX___auto_compile_css() {
     // Only run in development mode
     if ( ! defined( 'DEV_MODE' ) || ! DEV_MODE ) {
         return;
@@ -93,5 +91,5 @@ function auto_compile_css() {
 }
 
 // Hook to compile CSS on page load in dev mode
-add_action( 'init', '__CHILD_THEME_PREFIX___auto_compile_css', 1 );
+add_action( 'init', '__CHILD_THEME_PREFIX___auto_compile_css');
 
