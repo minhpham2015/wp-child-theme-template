@@ -580,13 +580,9 @@ See the [ACF Integration](#acf-integration) section above for detailed informati
 - Check `inc/acf.php` file exists and is loaded in `inc/init-load.php`
 - Verify no PHP errors in WordPress debug log
 
-## 📄 License
-
-[Add your license here]
-
 ## 👤 Author
 
-[Your Name/Company]
+**Minh Beplus**
 
 ---
 
