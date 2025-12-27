@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Check if ACF is active and register Theme Options page
  */
-function register_acf_options_page() {
+function __CHILD_THEME_PREFIX___register_acf_options_page() {
     
     // Check if ACF is active
     if ( ! function_exists( 'acf_add_options_page' ) ) {
@@ -33,5 +33,5 @@ function register_acf_options_page() {
     ] );
 }
 
-add_action( 'acf/init', __NAMESPACE__ . '\\register_acf_options_page' );
+add_action( 'acf/init',  '__CHILD_THEME_PREFIX___register_acf_options_page' );
 

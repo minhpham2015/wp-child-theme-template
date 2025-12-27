@@ -93,5 +93,5 @@ function auto_compile_css() {
 }
 
 // Hook to compile CSS on page load in dev mode
-add_action( 'init', __NAMESPACE__ . '\\auto_compile_css', 1 );
+add_action( 'init', '__CHILD_THEME_PREFIX___auto_compile_css', 1 );
 

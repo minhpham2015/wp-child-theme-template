@@ -149,9 +149,9 @@ $env:DEV_MODE="true"
 set DEV_MODE=true
 ```
 
-**Method 2: Edit config.php**
+**Method 2: Edit inc/init-load.php**
 ```php
-// In config.php, uncomment and set to true:
+// In inc/init-load.php, uncomment and set to true:
 define( 'DEV_MODE', true );
 ```
 
@@ -179,7 +179,7 @@ When `DEV_MODE` is enabled:
    # Or in Windows PowerShell
    $env:DEV_MODE="true"
    
-   # Or edit config.php and set DEV_MODE to true
+   # Or edit inc/init-load.php and set DEV_MODE to true
    define( 'DEV_MODE', true );
    ```
 
@@ -197,7 +197,7 @@ When `DEV_MODE` is enabled:
    # Unset environment variable
    unset DEV_MODE
    
-   # Or set DEV_MODE to false in config.php
+   # Or set DEV_MODE to false in inc/init-load.php
    define( 'DEV_MODE', false );
    ```
 
@@ -268,11 +268,10 @@ child-theme/
 │
 ├── package.json                 # npm dependencies & scripts
 ├── composer.json                # Composer dependencies & scripts
-├── config.php                   # Theme configuration (DEV_MODE)
 └── .gitignore                   # Git ignore rules
 │
 ├── inc/                         # PHP includes
-│   ├── init-load.php            # Loads all includes
+│   ├── init-load.php            # Loads all includes + Theme config (DEV_MODE)
 │   ├── build.php                # Auto CSS compilation (DEV_MODE)
 │   ├── static.php               # Enqueues styles & scripts
 │   ├── hooks.php                # WordPress hooks & filters
@@ -314,7 +313,8 @@ This template uses placeholders that **MUST** be replaced with your actual value
 - `__CHILD_THEME_SLUG__` - Your child theme slug (lowercase, hyphens)
 - `__CHILD_THEME_NAME__` - Your child theme display name
 - `__PARENT_THEME_SLUG__` - Parent theme folder name
-- `__NAMESPACE__` - **REQUIRED** PHP namespace (PascalCase, e.g., `MyTheme` or `MyCompany\MyTheme`) - Used for all functions and classes
+- `__NAMESPACE__` - **REQUIRED** PHP namespace (PascalCase, e.g., `MyTheme` or `MyCompany\MyTheme`) - Used only for PHP namespace declarations
+- `__CHILD_THEME_PREFIX__` - **REQUIRED** Prefix for function names, class names, CSS/JS handles (PascalCase, e.g., `MyTheme`) - Used for function references, CSS/JS handles, and JavaScript variables
 - `__AUTHOR__` - Your name or company
 - `__DESCRIPTION__` - Theme description
 - `__VERSION__` - Version number (e.g., 1.0.0)
@@ -325,10 +325,15 @@ If your child theme is "My Awesome Theme":
 - `__CHILD_THEME_SLUG__` → `my-awesome-theme`
 - `__CHILD_THEME_NAME__` → `My Awesome Theme`
 - `__PARENT_THEME_SLUG__` → `parent-theme-slug` (your parent theme folder)
-- `__NAMESPACE__` → `MyAwesomeTheme` (PascalCase, no spaces or hyphens)
+- `__NAMESPACE__` → `MyAwesomeTheme` (PascalCase, no spaces or hyphens) - For PHP namespace declarations
+- `__CHILD_THEME_PREFIX__` → `MyAwesomeTheme` (PascalCase, no spaces or hyphens) - For function references, CSS/JS handles
 - `__AUTHOR__` → `Your Name`
 - `__DESCRIPTION__` → `A custom child theme for...`
 - `__VERSION__` → `1.0.0`
+
+> **💡 Note**: `__NAMESPACE__` and `__CHILD_THEME_PREFIX__` are typically the same value (e.g., `MyAwesomeTheme`), but serve different purposes:
+> - `__NAMESPACE__` is used for PHP `namespace` declarations
+> - `__CHILD_THEME_PREFIX__` is used for function references in hooks, CSS/JS handles, and JavaScript variables
 
 #### Quick Find & Replace:
 
@@ -339,15 +344,23 @@ If your child theme is "My Awesome Theme":
 
 **Using Command Line (Linux/Mac):**
 ```bash
-# Replace __CHILD_THEME_SLUG__ with my-awesome-theme
+# Replace all placeholders (run each command)
 find . -type f \( -name "*.php" -o -name "*.js" -o -name "*.css" -o -name "*.scss" \) -exec sed -i 's/__CHILD_THEME_SLUG__/my-awesome-theme/g' {} +
+find . -type f \( -name "*.php" -o -name "*.js" \) -exec sed -i 's/__CHILD_THEME_PREFIX__/MyAwesomeTheme/g' {} +
+find . -type f -name "*.php" -exec sed -i 's/__NAMESPACE__/MyAwesomeTheme/g' {} +
 ```
 
 **Using PowerShell (Windows):**
 ```powershell
-# Replace __CHILD_THEME_SLUG__ with my-awesome-theme
+# Replace all placeholders (run each command)
 Get-ChildItem -Recurse -Include *.php,*.js,*.css,*.scss | ForEach-Object {
     (Get-Content $_.FullName) -replace '__CHILD_THEME_SLUG__', 'my-awesome-theme' | Set-Content $_.FullName
+}
+Get-ChildItem -Recurse -Include *.php,*.js | ForEach-Object {
+    (Get-Content $_.FullName) -replace '__CHILD_THEME_PREFIX__', 'MyAwesomeTheme' | Set-Content $_.FullName
+}
+Get-ChildItem -Recurse -Include *.php | ForEach-Object {
+    (Get-Content $_.FullName) -replace '__NAMESPACE__', 'MyAwesomeTheme' | Set-Content $_.FullName
 }
 ```
 
@@ -382,7 +395,7 @@ Add a `screenshot.png` file (1200x900px recommended) to the theme root directory
 
 ## 🔷 PHP Namespaces
 
-This theme uses **PHP namespaces** for better code organization and to avoid naming conflicts. All functions are namespaced using the `__NAMESPACE__` placeholder.
+This theme uses **PHP namespaces** for better code organization and to avoid naming conflicts. PHP namespace declarations use `__NAMESPACE__`, while function references, CSS/JS handles use `__CHILD_THEME_PREFIX__`.
 
 ### How Namespaces Work
 
@@ -401,15 +414,15 @@ function my_function() {
 **Method 1: Full namespace path**
 ```php
 <?php
-// Call function with full namespace
-$result = __NAMESPACE__\get_acf_option( 'field_name', 'default' );
+// Call function with full namespace (using prefix)
+$result = __CHILD_THEME_PREFIX__\get_acf_option( 'field_name', 'default' );
 ```
 
 **Method 2: Import with `use` statement (Recommended)**
 ```php
 <?php
-use __NAMESPACE__\get_acf_option;
-use __NAMESPACE__\render_hero;
+use __CHILD_THEME_PREFIX__\get_acf_option;
+use __CHILD_THEME_PREFIX__\render_hero;
 
 // Now you can use the function directly
 $value = get_acf_option( 'field_name', 'default' );
@@ -419,7 +432,7 @@ render_hero();
 **Method 3: Import multiple functions**
 ```php
 <?php
-use __NAMESPACE__\{ get_acf_option, render_hero, dump };
+use __CHILD_THEME_PREFIX__\{ get_acf_option, render_hero, dump };
 
 // Use imported functions
 $value = get_acf_option( 'field_name' );
@@ -427,23 +440,25 @@ render_hero();
 dump( $data );
 ```
 
-### Available Namespaced Functions
+### Available Functions
 
-- `__NAMESPACE__\enqueue_assets()` - Enqueues styles and scripts
-- `__NAMESPACE__\add_body_class( $classes )` - Adds body class
-- `__NAMESPACE__\dump( $data )` - Debug helper function
-- `__NAMESPACE__\ajax_demo()` - AJAX demo handler
-- `__NAMESPACE__\button_shortcode( $atts )` - Button shortcode handler
-- `__NAMESPACE__\render_hero()` - Renders hero section
-- `__NAMESPACE__\get_acf_option( $field_name, $default )` - Gets ACF option
-- `__NAMESPACE__\register_acf_options_page()` - Registers ACF options page
+- `__CHILD_THEME_PREFIX__\enqueue_assets()` - Enqueues styles and scripts
+- `__CHILD_THEME_PREFIX__\add_body_class( $classes )` - Adds body class
+- `__CHILD_THEME_PREFIX__\dump( $data )` - Debug helper function
+- `__CHILD_THEME_PREFIX__\ajax_demo()` - AJAX demo handler
+- `__CHILD_THEME_PREFIX__\button_shortcode( $atts )` - Button shortcode handler
+- `__CHILD_THEME_PREFIX__\render_hero()` - Renders hero section
+- `__CHILD_THEME_PREFIX__\get_acf_option( $field_name, $default )` - Gets ACF option
+- `__CHILD_THEME_PREFIX__\register_acf_options_page()` - Registers ACF options page
 
 ### Important Notes
 
-- ⚠️ **Namespace is REQUIRED** - All functions use namespaces, so `__NAMESPACE__` must be replaced
-- 📝 **Use PascalCase** - Namespace should be PascalCase (e.g., `MyTheme`, not `my-theme`)
+- ⚠️ **Namespace is REQUIRED** - PHP namespace declarations use `__NAMESPACE__` (must be replaced)
+- ⚠️ **Prefix is REQUIRED** - Function references, CSS/JS handles use `__CHILD_THEME_PREFIX__` (must be replaced)
+- 📝 **Use PascalCase** - Both `__NAMESPACE__` and `__CHILD_THEME_PREFIX__` should be PascalCase (e.g., `MyTheme`, not `my-theme`)
 - 🔗 **No spaces or hyphens** - Use underscores or backslashes for sub-namespaces only
-- ✅ **Consistent naming** - Keep the same namespace throughout all files
+- ✅ **Consistent naming** - Keep the same namespace and prefix throughout all files
+- 💡 **Typically the same value** - `__NAMESPACE__` and `__CHILD_THEME_PREFIX__` are usually the same (e.g., `MyTheme`), but serve different purposes
 
 ## 🎨 ACF Integration
 
@@ -474,7 +489,7 @@ The theme automatically checks if ACF is active and creates a "Theme Options" pa
 3. **Use Options in Templates**:
    ```php
    <?php
-   use __NAMESPACE__\get_acf_option;
+   use __CHILD_THEME_PREFIX__\get_acf_option;
    
    // Method 1: Using helper function (recommended)
    $header_text = get_acf_option( 'header_text', 'Default Header' );
@@ -505,7 +520,7 @@ get_acf_option( string $field_name, mixed $default = false )
 **Example:**
 ```php
 <?php
-use __NAMESPACE__\get_acf_option;
+use __CHILD_THEME_PREFIX__\get_acf_option;
 
 // Get header text with fallback
 $header = get_acf_option( 'header_text', 'Welcome' );
@@ -628,7 +643,7 @@ See the [ACF Integration](#acf-integration) section above for detailed informati
 - **Build before deployment** - Always run `npm run build` before deploying to production
 - **Don't commit node_modules** - Already in `.gitignore`
 - **SCSS compilation** - The `main.css` file is auto-generated, don't edit it directly
-- **PHP Namespaces** - **REQUIRED**: All functions use namespaces. Replace `__NAMESPACE__` with your PascalCase namespace (e.g., `MyTheme`). Use `__NAMESPACE__\function_name()` or `use __NAMESPACE__\function_name;` to call them. See [PHP Namespaces](#php-namespaces) section for details.
+- **PHP Namespaces** - **REQUIRED**: Replace `__NAMESPACE__` with your PascalCase namespace (e.g., `MyTheme`) for PHP namespace declarations. Replace `__CHILD_THEME_PREFIX__` with the same value for function references, CSS/JS handles. Use `__CHILD_THEME_PREFIX__\function_name()` or `use __CHILD_THEME_PREFIX__\function_name;` to call functions. See [PHP Namespaces](#php-namespaces) section for details.
 - **ACF Theme Options** - Automatically creates "Theme Options" page when ACF plugin is installed and active. See [ACF Integration](#acf-integration) section for usage examples.
 - **DEV_MODE** - Enable `DEV_MODE` for automatic CSS compilation on page load. Always disable in production. See [Development Mode](#development-mode-dev_mode) section for details.
 
@@ -650,7 +665,7 @@ See the [ACF Integration](#acf-integration) section above for detailed informati
 ### JavaScript errors
 
 - Check that jQuery is loaded (it's included as a dependency)
-- Verify `__CHILD_THEME_SLUG__Data` object is available in browser console
+- Verify `__CHILD_THEME_PREFIX__Data` object is available in browser console
 - Ensure JavaScript file exists and is properly enqueued
 
 ### Build errors
@@ -662,10 +677,11 @@ See the [ACF Integration](#acf-integration) section above for detailed informati
 
 ### Namespace errors
 
-- Ensure `__NAMESPACE__` placeholder is replaced in ALL PHP files
-- Use PascalCase for namespace (e.g., `MyTheme`, not `my-theme`)
-- Check that namespace is consistent across all files
-- Verify function calls use correct namespace syntax: `__NAMESPACE__\function_name()` or import with `use`
+- Ensure `__NAMESPACE__` placeholder is replaced in ALL PHP files (for namespace declarations)
+- Ensure `__CHILD_THEME_PREFIX__` placeholder is replaced in ALL PHP and JS files (for function references, CSS/JS handles)
+- Use PascalCase for both (e.g., `MyTheme`, not `my-theme`)
+- Check that namespace and prefix are consistent across all files
+- Verify function calls use correct prefix syntax: `__CHILD_THEME_PREFIX__\function_name()` or import with `use __CHILD_THEME_PREFIX__\function_name;`
 
 ### ACF Theme Options not appearing
 
@@ -677,12 +693,12 @@ See the [ACF Integration](#acf-integration) section above for detailed informati
 
 ### DEV_MODE not working
 
-- Verify `DEV_MODE` is set to `true` in `config.php` or as environment variable
+- Verify `DEV_MODE` is set to `true` in `inc/init-load.php` or as environment variable
 - **Install composer dependencies**: Run `composer install` to install `scssphp/scssphp` package
 - Check that `vendor/scssphp/scssphp` directory exists (composer package installed)
 - Ensure `assets/scss/main.scss` file exists
 - Check file permissions - WordPress needs write access to `assets/css/` directory
-- Verify `config.php` is loaded in `functions.php`
+- Verify `inc/init-load.php` is loaded in `functions.php` (it should be)
 - Check WordPress debug log for PHP errors
 - Note: DEV_MODE only compiles if SCSS is newer than CSS (smart compilation)
 - **Important**: DEV_MODE uses PHP-based SCSS compiler (`scssphp/scssphp`), not Node.js sass

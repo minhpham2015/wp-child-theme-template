@@ -12,9 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Shortcode: [__CHILD_THEME_SLUG___button]
+ * Shortcode: [__CHILD_THEME_PREFIX___button]
  */
-function button_shortcode( $atts ) {
+function __CHILD_THEME_PREFIX___button_shortcode( $atts ) {
 
     $atts = shortcode_atts(
         [
@@ -32,7 +32,7 @@ function button_shortcode( $atts ) {
 }
 
 add_shortcode(
-    '__CHILD_THEME_SLUG___button',
-    __NAMESPACE__ . '\\button_shortcode'
+    '__CHILD_THEME_PREFIX___button',
+     '__CHILD_THEME_PREFIX___button_shortcode'
 );
 
