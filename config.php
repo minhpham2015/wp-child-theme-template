@@ -27,10 +27,10 @@ if ( ! defined( 'DEV_MODE' ) ) {
         define( 'DEV_MODE', filter_var( $dev_mode_env, FILTER_VALIDATE_BOOLEAN ) );
     } else {
         // Default: false (production mode)
-        define( 'DEV_MODE', false );
+        //define( 'DEV_MODE', false );
         
         // Uncomment and set to true to enable dev mode:
-        // define( 'DEV_MODE', true );
+        define( 'DEV_MODE', true );
     }
 }
 

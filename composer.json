@@ -1,15 +1,4 @@
 {
-  "name": "__AUTHOR__/__CHILD_THEME_SLUG__",
-  "description": "__DESCRIPTION__",
-  "type": "wordpress-theme",
-  "version": "__VERSION__",
-  "license": "GPL-2.0-or-later",
-  "authors": [
-    {
-      "name": "__AUTHOR__",
-      "email": ""
-    }
-  ],
   "require": {
     "php": ">=7.4",
     "scssphp/scssphp": "^1.12"
@@ -37,7 +26,9 @@
   },
   "config": {
     "optimize-autoloader": true,
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "composer/installers": true
+    }
   }
 }
-
